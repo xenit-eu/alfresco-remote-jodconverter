@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.crypto.dsig.TransformException;
@@ -32,6 +33,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteJODConverterContentTransformer extends AbstractContentTransformer2 {
 
+	private static final String JODCONVERTER_ENDPOINT_KEY = "content.transformer.RemoteJODConverter.endpoint";
+	private static final String DEFAULT_JODCONVERTER_ENDPOINT = "https://jodconverter.dev.xenit.eu/converter/service";
 	private static final Log logger = LogFactory.getLog(RemoteJODConverterContentTransformer.class);
 	private static final List<String> TARGET_MIMETYPES = Arrays
 			.asList(new String[] { MimetypeMap.MIMETYPE_TEXT_PLAIN, MimetypeMap.MIMETYPE_PDF });
@@ -54,6 +57,13 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			MimetypeMap.MIMETYPE_OPENXML_WORD_TEMPLATE, MimetypeMap.MIMETYPE_OPENOFFICE1_WRITER,
 			MimetypeMap.MIMETYPE_OPENOFFICE1_IMPRESS, MimetypeMap.MIMETYPE_WORD, MimetypeMap.MIMETYPE_PPT,
 			MimetypeMap.MIMETYPE_EXCEL });
+
+	protected Properties properties;
+	
+	
+	public void setProperties(Properties properties) {
+		this.properties = properties;
+	}
 
 	/**
 	 * Can we do the requested transformation via remote JODConverter? We
@@ -108,8 +118,10 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 				startTime = System.currentTimeMillis();
 			}
 
-			// TODO should externalize this in alfresco-global.properties
-			String url = "https://jodconverter.dev.xenit.eu/converter/service";
+			// TODO shouldn't we be using a factory pattern with reusable resources ?
+			// TODO wouldn't it be more interesting if we implement a connection pool
+			// in order to avoid DDoSing the remote JODConverter ?
+			String url = (properties.containsKey(JODCONVERTER_ENDPOINT_KEY) ? properties.getProperty(JODCONVERTER_ENDPOINT_KEY)    : DEFAULT_JODCONVERTER_ENDPOINT);
 			URL obj = new URL(url);
 			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
@@ -122,8 +134,8 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			long timeoutMs = options.getTimeoutMs();
 			if (timeoutMs != -1)
 				con.setReadTimeout((int) timeoutMs);
-			// TODO Should I check for file size limits are?
-			// Aren't they enforced by the AbstractContentTransformer2?
+			// TODO Should I check for file size limits?
+			// Aren't they enforced by default by the AbstractContentTransformer2?
 
 			// add request header
 			con.setRequestMethod("POST");
