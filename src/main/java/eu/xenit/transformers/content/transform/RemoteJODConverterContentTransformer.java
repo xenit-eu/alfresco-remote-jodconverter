@@ -8,12 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.xml.crypto.dsig.TransformException;
 
 import org.alfresco.repo.content.MimetypeMap;
@@ -123,7 +123,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			// in order to avoid DDoSing the remote JODConverter ?
 			String url = (properties.containsKey(JODCONVERTER_ENDPOINT_KEY) ? properties.getProperty(JODCONVERTER_ENDPOINT_KEY)    : DEFAULT_JODCONVERTER_ENDPOINT);
 			URL obj = new URL(url);
-			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 			// Set up limits -- TODO check if these values are taken into
 			// consideration? I am getting the feeling timeouts are handled
