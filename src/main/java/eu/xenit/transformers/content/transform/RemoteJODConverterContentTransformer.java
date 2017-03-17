@@ -44,6 +44,9 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 	private static final String USAGE_PATTERN = "Content transformation has completed:\n" + "    Transformer: %s\n"
 			+ "    Content Reader: %s\n" + "    Memory (MB): Used/Total/Maximum - %f/%f/%f\n" + "    Time Spent: %d ms";
 
+	public static final String MIMETYPE_APPLICATION_RTF = "application/rtf";
+	public static final String MIMETYPE_APPLICATION_X_RTF = "application/x-rtf";
+	public static final String MIMETYPE_TEXT_RICHTEXT = "text/richtext";
 	private static final List<String> SOURCE_MIMETYPES = Arrays.asList(new String[] {
 			MimetypeMap.MIMETYPE_OPENDOCUMENT_PRESENTATION, MimetypeMap.MIMETYPE_OPENDOCUMENT_SPREADSHEET,
 			MimetypeMap.MIMETYPE_OPENDOCUMENT_TEXT, MimetypeMap.MIMETYPE_OPENDOCUMENT_GRAPHICS,
@@ -56,6 +59,8 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			MimetypeMap.MIMETYPE_OPENXML_SPREADSHEET, MimetypeMap.MIMETYPE_OPENXML_WORDPROCESSING,
 			MimetypeMap.MIMETYPE_OPENXML_WORD_TEMPLATE, MimetypeMap.MIMETYPE_OPENOFFICE1_WRITER,
 			MimetypeMap.MIMETYPE_OPENOFFICE1_IMPRESS, MimetypeMap.MIMETYPE_WORD, MimetypeMap.MIMETYPE_PPT,
+			MimetypeMap.MIMETYPE_TEXT_PLAIN, MIMETYPE_APPLICATION_RTF, MIMETYPE_APPLICATION_X_RTF, MIMETYPE_TEXT_RICHTEXT,
+			MimetypeMap.MIMETYPE_HTML, MimetypeMap.MIMETYPE_XHTML,
 			MimetypeMap.MIMETYPE_EXCEL });
 
 	protected Properties properties;
@@ -72,6 +77,9 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 	@Override
 	public boolean isTransformableMimetype(String sourceMimetype, String targetMimetype,
 			TransformationOptions options) {
+		logger.debug("Checking if can transform '"+sourceMimetype+"' to '"+targetMimetype+"' ...");
+		logger.debug("Transformation options :" + options.toString());
+
 		if (!SOURCE_MIMETYPES.contains(sourceMimetype)) {
 			// The source isn't one of ours
 			return false;
@@ -118,9 +126,6 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 				startTime = System.currentTimeMillis();
 			}
 
-			// TODO shouldn't we be using a factory pattern with reusable resources ?
-			// TODO wouldn't it be more interesting if we implement a connection pool
-			// in order to avoid DDoSing the remote JODConverter ?
 			String url = (properties.containsKey(JODCONVERTER_ENDPOINT_KEY) ? properties.getProperty(JODCONVERTER_ENDPOINT_KEY)    : DEFAULT_JODCONVERTER_ENDPOINT);
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -134,8 +139,6 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			long timeoutMs = options.getTimeoutMs();
 			if (timeoutMs != -1)
 				con.setReadTimeout((int) timeoutMs);
-			// TODO Should I check for file size limits?
-			// Aren't they enforced by default by the AbstractContentTransformer2?
 
 			// add request header
 			con.setRequestMethod("POST");
