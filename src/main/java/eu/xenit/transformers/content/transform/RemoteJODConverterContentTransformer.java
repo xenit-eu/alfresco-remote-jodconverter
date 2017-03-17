@@ -26,10 +26,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * @author Younes REGAIEG <younes@regaieg.info>
- *
  * This transformer relies on a remote JODConverter for office
  * documents transformations.
+ *
+ * @author <a href="mailto:younes.regaieg@xenit.eu">Younes REGAIEG</a>
  */
 public class RemoteJODConverterContentTransformer extends AbstractContentTransformer2 {
 
@@ -64,8 +64,8 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			MimetypeMap.MIMETYPE_EXCEL });
 
 	protected Properties properties;
-	
-	
+
+
 	public void setProperties(Properties properties) {
 		this.properties = properties;
 	}
@@ -100,7 +100,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.alfresco.repo.content.transform.AbstractContentTransformer2#
 	 * transformInternal(org.alfresco.service.cmr.repository.ContentReader,
 	 * org.alfresco.service.cmr.repository.ContentWriter,
