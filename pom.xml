@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.xenit.transformers</groupId>
 	<artifactId>alfresco-remote-jodconverter</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.1.1</version>
 	<name>alfresco-remote-jodconverter Repository AMP project</name>
 	<packaging>amp</packaging>
 	<description>Manages the lifecycle of the alfresco-remote-jodconverter Repository AMP (Alfresco Module Package)</description>
@@ -52,7 +52,7 @@
 		<connection>scm:git:git@bitbucket.org:xenit/alfresco-remote-jodconverter.git</connection>
 		<developerConnection>scm:git:git@bitbucket.org:xenit/alfresco-remote-jodconverter.git</developerConnection>
 		<url>https://bitbucket.org/xenit/alfresco-remote-jodconverter</url>
-	  <tag>HEAD</tag>
+	  <tag>1.1.1</tag>
   </scm>
 	<issueManagement>
 		<system>bitbucket</system>
