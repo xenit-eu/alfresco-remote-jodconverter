@@ -1,22 +1,14 @@
 node {
 	stage ('Build and test the addon'){
-	    checkout scm
-	    try{
-		    sh "mvn clean install"
+	    	checkout scm
+	    	try{
+			// use the id of the globally configured maven instance
+			def mvnTool = tool 'maven-3.3.9'
+
+			// execute maven
+			sh "${mvnTool}/bin/mvn clean install" 
 		} catch (err) {
-             currentBuild.result = "FAILED"
-        }
+             		currentBuild.result = "FAILED"
+        	}
 	}
-
-	stage ('Deploy to artifactory'){
-        // we want to pick up the version from the pom
-        def pom = readMavenPom file: 'pom.xml'
-
-        when {
-            expression { pom.version ==~ /(?i)(SNAPSHOT)/ }
-        }
-        steps {
-    	    sh "mvn deploy"
-        }
-    }
 }
