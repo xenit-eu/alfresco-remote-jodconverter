@@ -61,6 +61,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			MimetypeMap.MIMETYPE_OPENOFFICE1_IMPRESS, MimetypeMap.MIMETYPE_WORD, MimetypeMap.MIMETYPE_PPT,
 			MimetypeMap.MIMETYPE_TEXT_PLAIN, MIMETYPE_APPLICATION_RTF, MIMETYPE_APPLICATION_X_RTF, MIMETYPE_TEXT_RICHTEXT,
 			MimetypeMap.MIMETYPE_HTML, MimetypeMap.MIMETYPE_XHTML,
+			MimetypeMap.MIMETYPE_TEXT_PLAIN,
 			MimetypeMap.MIMETYPE_EXCEL });
 
 	protected Properties properties;
