@@ -12,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import javax.xml.crypto.dsig.TransformException;
 
@@ -33,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteJODConverterContentTransformer extends AbstractContentTransformer2 {
 
-	private static final String JODCONVERTER_ENDPOINT_KEY = "content.transformer.RemoteJODConverter.endpoint";
 	private static final String DEFAULT_JODCONVERTER_ENDPOINT = "https://jodconverter.dev.xenit.eu/converter/service";
 	private static final Log logger = LogFactory.getLog(RemoteJODConverterContentTransformer.class);
 	private static final List<String> TARGET_MIMETYPES = Arrays
@@ -64,14 +62,18 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			MimetypeMap.MIMETYPE_TEXT_PLAIN,
 			MimetypeMap.MIMETYPE_EXCEL });
 
-	protected Properties properties;
+	protected String endpoint = DEFAULT_JODCONVERTER_ENDPOINT;
+	
+	
+    /**
+     * @param endpoint the endpoint to set
+     */
+    public void setEndpoint(String endpoint)
+    {
+        this.endpoint = endpoint;
+    }
 
-
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
-	/**
+    /**
 	 * Can we do the requested transformation via remote JODConverter? We
 	 * support transforming office documents to PDF or Text
 	 */
@@ -127,8 +129,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 				startTime = System.currentTimeMillis();
 			}
 
-			String url = (properties.containsKey(JODCONVERTER_ENDPOINT_KEY) ? properties.getProperty(JODCONVERTER_ENDPOINT_KEY)    : DEFAULT_JODCONVERTER_ENDPOINT);
-			URL obj = new URL(url);
+			URL obj = new URL(endpoint);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 			// Set up limits -- TODO check if these values are taken into
@@ -164,7 +165,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 					logger.debug("Target MimeType : " + targetMimeType);
 					logger.debug("Source size : " + reader.getSize());
 					logger.debug("Source ContentURL : " + reader.getContentUrl());
-					logger.debug("Remote JODConverter instance : " + url);
+					logger.debug("Remote JODConverter instance : " + endpoint);
 				}
 				throw new TransformException(con.getResponseMessage());
 			}
