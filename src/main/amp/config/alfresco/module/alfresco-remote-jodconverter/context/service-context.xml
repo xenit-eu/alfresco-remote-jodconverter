@@ -1,17 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="transformer.RemoteJODConverter"
-		class="eu.xenit.transformers.content.transform.RemoteJODConverterContentTransformer"
-		parent="baseContentTransformer">
-		<!-- Enables timeout support -->
-		<property name="useTimeoutThread" value="true" />
-		<property name="properties">
-			<ref bean="global-properties" />
-		</property>
-	</bean>
+   <bean id="transformer.RemoteJODConverter" class="eu.xenit.transformers.content.transform.RemoteJODConverterContentTransformer"
+        parent="baseContentTransformer">
+        <!-- Enables timeout support -->
+        <property name="useTimeoutThread" value="true" />
+        <property name="endpoint" value="${content.transformer.RemoteJODConverter.endpoint}" />
+    </bean>
 
 </beans>
