@@ -6,8 +6,8 @@
    <bean id="transformer.RemoteJODConverter" class="eu.xenit.transformers.content.transform.RemoteJODConverterContentTransformer"
         parent="baseContentTransformer">
         <!-- Enables timeout support -->
-        <property name="useTimeoutThread" value="true" />
-        <property name="endpoint" value="${content.transformer.RemoteJODConverter.endpoint}" />
+       <property name="useTimeoutThread" value="${content.transformer.RemoteJODConverter.useTimeoutThread}"/>
+       <property name="endpoint" value="${content.transformer.RemoteJODConverter.endpoint}" />
     </bean>
 
 </beans>

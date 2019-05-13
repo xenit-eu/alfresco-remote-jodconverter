@@ -180,18 +180,21 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 				try {
 					is.close();
 				} catch (Throwable e) {
+					throw new RuntimeException(e);
 				}
 			}
 			if (ow != null) {
 				try {
 					ow.close();
 				} catch (Throwable e) {
+					throw new RuntimeException(e);
 				}
 			}
 			if (os != null) {
 				try {
 					os.close();
 				} catch (Throwable e) {
+					throw new RuntimeException(e);
 				}
 			}
 		}
