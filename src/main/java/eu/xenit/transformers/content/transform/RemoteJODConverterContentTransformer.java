@@ -1,26 +1,16 @@
 /**
- * 
+ *
  */
 package eu.xenit.transformers.content.transform;
 
-import java.io.DataOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.xml.crypto.dsig.TransformException;
-
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformer2;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.TransformationOptions;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,20 +50,21 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			MimetypeMap.MIMETYPE_TEXT_PLAIN, MIMETYPE_APPLICATION_RTF, MIMETYPE_APPLICATION_X_RTF, MIMETYPE_TEXT_RICHTEXT,
 			MimetypeMap.MIMETYPE_HTML, MimetypeMap.MIMETYPE_XHTML,
 			MimetypeMap.MIMETYPE_TEXT_PLAIN,
+			MimetypeMap.MIMETYPE_VISIO,
 			MimetypeMap.MIMETYPE_EXCEL });
 
 	protected String endpoint = DEFAULT_JODCONVERTER_ENDPOINT;
-	
-	
-    /**
-     * @param endpoint the endpoint to set
-     */
-    public void setEndpoint(String endpoint)
-    {
-        this.endpoint = endpoint;
-    }
 
-    /**
+
+	/**
+	 * @param endpoint the endpoint to set
+	 */
+	public void setEndpoint(String endpoint)
+	{
+		this.endpoint = endpoint;
+	}
+
+	/**
 	 * Can we do the requested transformation via remote JODConverter? We
 	 * support transforming office documents to PDF or Text
 	 */
@@ -112,66 +103,34 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 	@Override
 	protected void transformInternal(ContentReader reader, ContentWriter writer, TransformationOptions options)
 			throws Exception {
-
-		OutputStream os = writer.getContentOutputStream();
-		String encoding = writer.getEncoding();
 		String targetMimeType = writer.getMimetype();
 		String sourceMimeType = reader.getMimetype();
 
-		Writer ow = new OutputStreamWriter(os, encoding);
-
-		InputStream is = null;
-
 		long startTime = 0;
+
+		InputStream is = reader.getContentInputStream();
+
+		Multipart part = new Multipart(DEFAULT_JODCONVERTER_ENDPOINT, "UTF-8");
+		part.addInputStreamPart("inputFile",is,sourceMimeType);
+		part.addFormFieldWithoutEnding("outputFormat", "pdf");
+
 		try {
-			is = reader.getContentInputStream();
+			part.finish(writer);
+		} catch (Exception e) {
+// Something went extremely wrong on remote server
+			logger.error("Remote transformation failed, remote host returned response code :" + part.getStatus());
 			if (logger.isDebugEnabled()) {
-				startTime = System.currentTimeMillis();
+				logger.debug("Source MimeType : " + sourceMimeType);
+				logger.debug("Target MimeType : " + targetMimeType);
+				logger.debug("Source size : " + reader.getSize());
+				logger.debug("Source ContentURL : " + reader.getContentUrl());
+				logger.debug("Remote JODConverter instance : " + endpoint);
 			}
+			throw new RuntimeException(e);
 
-			URL obj = new URL(endpoint);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		}
 
-			// Set up limits -- TODO check if these values are taken into
-			// consideration? I am getting the feeling timeouts are handled
-			// on the dedicated thread for this transformation
-			long readLimitTimeMs = options.getReadLimitTimeMs();
-			if (readLimitTimeMs != -1)
-				con.setConnectTimeout((int) readLimitTimeMs);
-			long timeoutMs = options.getTimeoutMs();
-			if (timeoutMs != -1)
-				con.setReadTimeout((int) timeoutMs);
-
-			// add request header
-			con.setRequestMethod("POST");
-			con.setRequestProperty("Content-Type", sourceMimeType);
-			con.setRequestProperty("Accept", targetMimeType);
-
-			// Send post request
-			con.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-
-			// FIXME add support for 2GB+ content... Really ?
-			IOUtils.copy(is, wr);
-			wr.flush();
-			wr.close();
-
-			int responseCode = con.getResponseCode();
-			if (responseCode != 200) {
-				// Something went extremely wrong on remote server
-				logger.error("Remote transformation failed, remote host returned response code :" + responseCode);
-				if (logger.isDebugEnabled()) {
-					logger.debug("Source MimeType : " + sourceMimeType);
-					logger.debug("Target MimeType : " + targetMimeType);
-					logger.debug("Source size : " + reader.getSize());
-					logger.debug("Source ContentURL : " + reader.getContentUrl());
-					logger.debug("Remote JODConverter instance : " + endpoint);
-				}
-				throw new TransformException(con.getResponseMessage());
-			}
-
-			IOUtils.copy(con.getInputStream(), os);
-		} finally {
+		finally {
 			if (logger.isDebugEnabled()) {
 				logger.debug(calculateMemoryAndTimeUsage(reader, startTime));
 			}
@@ -179,20 +138,6 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 			if (is != null) {
 				try {
 					is.close();
-				} catch (Throwable e) {
-					throw new RuntimeException(e);
-				}
-			}
-			if (ow != null) {
-				try {
-					ow.close();
-				} catch (Throwable e) {
-					throw new RuntimeException(e);
-				}
-			}
-			if (os != null) {
-				try {
-					os.close();
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}
