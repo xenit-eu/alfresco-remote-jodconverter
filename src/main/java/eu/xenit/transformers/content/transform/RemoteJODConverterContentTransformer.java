@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteJODConverterContentTransformer extends AbstractContentTransformer2 {
 
-	private static final String DEFAULT_JODCONVERTER_ENDPOINT = "https://jodconverter.dev.xenit.eu/converter/service";
+	private static final String DEFAULT_JODCONVERTER_ENDPOINT = "http://jodconverter:8080/converter";
 	private static final Log logger = LogFactory.getLog(RemoteJODConverterContentTransformer.class);
 	private static final List<String> TARGET_MIMETYPES = Arrays
 			.asList(new String[] { MimetypeMap.MIMETYPE_TEXT_PLAIN, MimetypeMap.MIMETYPE_PDF });
