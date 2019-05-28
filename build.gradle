@@ -1,0 +1,103 @@
+plugins {
+    id 'java'
+    id 'eu.xenit.alfresco' version "0.2.0"
+    id 'eu.xenit.amp' version "0.2.0"
+    id "eu.xenit.docker-alfresco" version "4.0.2"
+}
+
+description = 'Remote-jodconverter for Alfresco'
+
+group = 'eu.xenit.transformers'
+version = '1.1.5-SNAPSHOT'
+
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenLocal()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+ext.alfrescoVersion = "5.1.g"
+
+dependencies {
+    alfrescoProvided "org.alfresco:alfresco-repository:${alfrescoVersion}"
+
+    /* Alfresco with remote jod converter amp docker image */
+    alfrescoAmp files(project.amp)
+    baseAlfrescoWar "org.alfresco:alfresco:${alfrescoVersion}@war"
+    baseShareWar "org.alfresco:share:${alfrescoVersion}@war"    
+}
+
+
+dockerAlfresco {
+    baseImage = "hub.xenit.eu/alfresco-community:${alfrescoVersion}"
+    // current base images have already a version of jodconverter amp, therefore delete that first (leanImage=false)
+    leanImage = false
+
+    dockerBuild {
+        repository = 'xeniteu/alfresco-remote-jodconverter-test'
+        automaticTags = true
+    }
+}
+
+dockerCompose {
+    useComposeFiles = ["${project.projectDir}/src/test/resources/docker-compose.yml"]
+}
+
+task openUrlInBrowser {
+    dependsOn 'composeUp'
+    doLast {
+        def serviceInfo = getTasks().getByName("composeUp").getServicesInfos().get("alfresco-core")
+        def host = serviceInfo.getHost()
+        def port = serviceInfo.getPort()
+        java.awt.Desktop.desktop.browse "http://$host:$port/share".toURI()
+    }
+
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+
+apply plugin: 'maven-publish'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+            artifact amp
+
+        }
+    }
+    repositories {
+        maven {
+            name 'snapshot'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+            credentials {
+                username property("eu.xenit.artifactory.username")
+                password property("eu.xenit.artifactory.password")
+            }
+        }
+        maven {
+            name 'release'
+            url 'https://artifactory.xenit.eu/artifactory/libs-release-local'
+            credentials {
+                username property("eu.xenit.artifactory.username")
+                password property("eu.xenit.artifactory.password")
+            }
+        }
+
+    }
+}

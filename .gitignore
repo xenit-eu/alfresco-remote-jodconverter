@@ -8,3 +8,5 @@
 target/
 *.iml
 alf_data_dev/
+.gradle
+build

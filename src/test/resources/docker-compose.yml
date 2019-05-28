@@ -1,0 +1,26 @@
+version: '2.2'
+
+services:
+  alfresco:
+    image: ${DOCKER_IMAGE}
+    restart: unless-stopped
+    ports:
+      - 8080
+#      - 8000:8000 # DEBUG
+    environment:
+      - INDEX=noindex
+      - GLOBAL_content.transformer.RemoteJODConverter.endpoint=http://jodconverter:8080/converter
+#      - CATALINA_OPTS=-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
+
+  postgresql:
+    image: hub.xenit.eu/postgres
+    environment:
+      - POSTGRES_USER=alfresco
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=alfresco
+
+  jodconverter:
+  # TO DO: replace with public image once available
+    image: xeniteu/jodconverter:4.2.3-SNAPSHOT
+    ports:
+      - 8080

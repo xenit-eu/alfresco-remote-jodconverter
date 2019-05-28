@@ -13,6 +13,7 @@ import java.net.URLConnection;
 import org.alfresco.service.cmr.repository.ContentWriter;
 
 public class Multipart {
+
     private final String boundary;
     private static final String LINE_FEED = "\r\n";
     private HttpURLConnection httpConn;
@@ -32,12 +33,7 @@ public class Multipart {
     private int status;
 
     /**
-     * This constructor initializes a new HTTP POST request with content type
-     * is set to multipart/form-data
-     *
-     * @param requestURL
-     * @param charset
-     * @throws IOException
+     * This constructor initializes a new HTTP POST request with content type is set to multipart/form-data
      */
     public Multipart(String requestURL, String charset)
             throws IOException {
@@ -60,7 +56,7 @@ public class Multipart {
     /**
      * Adds a form field to the request
      *
-     * @param name  field name
+     * @param name field name
      * @param value field value
      */
     public void addFormField(String name, String value) {
@@ -88,9 +84,8 @@ public class Multipart {
     /**
      * Adds a upload file section to the request
      *
-     * @param fieldName  name attribute in input type="file" name="..."
+     * @param fieldName name attribute in input type="file" name="..."
      * @param uploadFile a File to be uploaded
-     * @throws IOException
      */
     public void addFilePart(String fieldName, File uploadFile)
             throws IOException {
@@ -149,7 +144,7 @@ public class Multipart {
     /**
      * Adds a header field to the request.
      *
-     * @param name  - name of the header field
+     * @param name - name of the header field
      * @param value - value of the header field
      */
     public void addHeaderField(String name, String value) {
