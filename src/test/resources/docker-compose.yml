@@ -13,7 +13,7 @@ services:
 #      - CATALINA_OPTS=-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
 
   postgresql:
-    image: hub.xenit.eu/postgres
+    image: xeniteu/postgres
     environment:
       - POSTGRES_USER=alfresco
       - POSTGRES_PASSWORD=admin

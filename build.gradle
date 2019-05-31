@@ -33,7 +33,9 @@ dependencies {
 
 
 dockerAlfresco {
+    // will need first to make these public
     baseImage = "hub.xenit.eu/alfresco-community:${alfrescoVersion}"
+
     // current base images have already a version of jodconverter amp, therefore delete that first (leanImage=false)
     leanImage = false
 
