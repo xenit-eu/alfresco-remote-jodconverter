@@ -153,3 +153,6 @@ content.transformer.RemoteJODConverter.extensions.<src-ext>.<dst-ext>.supported=
 content.transformer.RemoteJODConverter.extensions.<src-ext>.<dst-ext>.priority=30
 content.transformer.RemoteJODConverter.extensions.<src-ext>.<dst-ext>.maxSourceSizeKBytes=<max-filesize>
 ```
+
+## Publishing
+Currently only snapshots are published, without being signed.
