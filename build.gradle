@@ -1,19 +1,29 @@
 plugins {
     id 'java'
-    id 'eu.xenit.alfresco' version "0.2.0"
-    id 'eu.xenit.amp' version "0.2.0"
-    id "eu.xenit.docker-alfresco" version "4.0.2"
+    id 'eu.xenit.amp' version '0.2.0'
+    id 'eu.xenit.alfresco' version '0.2.0'
+    id 'eu.xenit.docker-alfresco' version '4.0.2'
+    id 'io.codearte.nexus-staging' version '0.21.0' // see https://github.com/Codearte/gradle-nexus-staging-plugin
+    id 'maven-publish'
+    id 'signing'
 }
 
-description = 'Remote-jodconverter for Alfresco'
+description = 'Remote-jodconverter amp for Alfresco'
 
 group = 'eu.xenit.transformers'
-version = '1.1.5-SNAPSHOT'
-
 sourceCompatibility = '1.8'
 
+def baseVersion = '1.1.5'
+def branchName = System.env.TRAVIS_BRANCH
+def isRelease = branchName != null && branchName.startsWith("release")
+if (isRelease)
+    version = "$baseVersion"
+else
+    version = "$baseVersion-SNAPSHOT"
+
+
 repositories {
-    mavenLocal()
+    mavenCentral()
 }
 
 tasks.withType(JavaCompile) {
@@ -28,7 +38,7 @@ dependencies {
     /* Alfresco with remote jod converter amp docker image */
     alfrescoAmp files(project.amp)
     baseAlfrescoWar "org.alfresco:alfresco:${alfrescoVersion}@war"
-    baseShareWar "org.alfresco:share:${alfrescoVersion}@war"    
+    baseShareWar "org.alfresco:share:${alfrescoVersion}@war"
 }
 
 
@@ -71,35 +81,46 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 
-apply plugin: 'maven-publish'
+
+nexusStaging {
+    packageGroup = project.group
+    username = System.env.PUBLISH_USER != null ? System.env.PUBLISH_USER : ''
+    password = System.env.PUBLISH_PASSWORD != null ? System.env.PUBLISH_PASSWORD : ''
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
             artifact amp
-
         }
     }
     repositories {
         maven {
-            name 'snapshot'
-            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-            credentials {
-                username property("eu.xenit.artifactory.username")
-                password property("eu.xenit.artifactory.password")
-            }
-        }
-        maven {
-            name 'release'
-            url 'https://artifactory.xenit.eu/artifactory/libs-release-local'
-            credentials {
-                username property("eu.xenit.artifactory.username")
-                password property("eu.xenit.artifactory.password")
-            }
-        }
+            def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+            def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
+            credentials {
+                username = System.env.PUBLISH_USER != null ? System.env.PUBLISH_USER : ''
+                password = System.env.PUBLISH_PASSWORD != null ? System.env.PUBLISH_PASSWORD : ''
+            }
+        }
+    }
+
+    signing {
+        required { !version.endsWith('SNAPSHOT') && gradle.taskGraph.hasTask("publish") }
+        sign publishing.publications.mavenJava
+    }
+
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(publish)) {
+            if ((System.env.SIGN_KEY_ID == null) || (System.env.SIGN_SECRET_KEY_RINGFILE == null) || (System.env.SIGN_PASSWORD==null)) {
+             //   throw new GradleException('You need to provide signing params in order to sign artifacts')
+            }
+
+            ext."signing.keyId" = System.env.SIGN_KEY_ID != null ? System.env.SIGN_KEY_ID : ''
+            ext."signing.secretKeyRingFile" = System.env.SIGN_SECRET_KEY_RINGFILE != null ? System.env.SIGN_SECRET_KEY_RINGFILE : ''
+            ext."signing.password" = System.env.SIGN_PASSWORD != null ? System.env.SIGN_PASSWORD : ''
+        }
     }
 }
