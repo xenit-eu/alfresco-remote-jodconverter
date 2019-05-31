@@ -24,6 +24,9 @@ else
 
 repositories {
     mavenCentral()
+    maven {
+            url "https://artifacts.alfresco.com/nexus/content/groups/public/"
+        }
 }
 
 tasks.withType(JavaCompile) {

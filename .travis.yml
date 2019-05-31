@@ -12,7 +12,7 @@ matrix:
     before_install:
     - chmod +x ./gradlew
     script:
-    - "./gradlew publish"
+    - ./gradlew publish
 env:
   global:
     secure: XVYuxbZ8xVUgr5opdn/IoG+sxTLM5rN0p+RJi0oJxk0oR4x2xaggHaRxsE7ZWcfYwqlaGWquwRJ+T/mgEySsLh2kaTPkhsaPrGMm0Pe3FOoO5RmMFIQ2DiKqOJ/Xmx3qpgKX3yQBcINMKAQnaVhPRwBnbLDYHQUuH50x2yF9tuUnn+apqSH2teQgA7l02psZy9NOKtcN2NlxbeULa0G65pKoHJM7ICYd22+2DgfW7FBu9+blYRdqTszkQBtyPM/D7f2ijFNTnWBHDhCz9nVR1Hp9g/5VfFFvwCKMKVXjFQ8Fqsgqr8D9r5hsmYnSxUTwSzFuWD7sv+oBa6VPy7nLH86QQ2If5Yp9PQDE7OmrIKi+tvw0qKZsiuKz41iYzYm4ovufmdlG2e5fBxdJQbwH4/1DiqT+nl4YI9voOaoOLBvVIjFLgpz62SgKfFVPrHBqovHTum8ctCKt27+B1LBgtmCItNKbfAqQloELKnpQctSTyuCokCjmStmwU+HEl3X3VfbtdGvvtPHbaY8Fek+EdUQse6dMt+LMF19VNdo+uJAczV65URb6aiGRbQlHm3XKFW2GZiG+yFjkkmjniybwtFtVhebzaaWCdfS9dG2xh1qqLI91g1lEiBOvLjHuG40YCUrH64xVIDMv68BlvXHLZPx9Awuf1W9V8cKRw2oOlEo=
