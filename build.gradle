@@ -117,13 +117,13 @@ signing {
 
 gradle.taskGraph.whenReady { graph ->
     if (graph.hasTask(publish)) {
-        if ((System.env.SIGN_KEY_ID == null) || (System.env.SIGN_SECRET_KEY_RINGFILE == null) || (System.env.SIGN_PASSWORD==null)) {
+        if ((System.env.SIGN_KEY_ID == null) || (System.env.SIGN_SECRET_KEY_RINGFILE == null) || (System.env.SIGN_PASSWORD == null)) {
             //throw new GradleException('You need to provide signing params in order to sign artifacts')
+        } else {
+            ext."signing.keyId" = (System.env.SIGN_KEY_ID != null ? System.env.SIGN_KEY_ID : '')
+            ext."signing.secretKeyRingFile" = (System.env.SIGN_SECRET_KEY_RINGFILE != null ? System.env.SIGN_SECRET_KEY_RINGFILE : '')
+            ext."signing.password" = (System.env.SIGN_PASSWORD != null ? System.env.SIGN_PASSWORD : '')
         }
-
-        ext."signing.keyId" = (System.env.SIGN_KEY_ID != null ? System.env.SIGN_KEY_ID : '')
-        ext."signing.secretKeyRingFile" = (System.env.SIGN_SECRET_KEY_RINGFILE != null ? System.env.SIGN_SECRET_KEY_RINGFILE : '')
-        ext."signing.password" = (System.env.SIGN_PASSWORD != null ? System.env.SIGN_PASSWORD : '')
     }
 }
 
