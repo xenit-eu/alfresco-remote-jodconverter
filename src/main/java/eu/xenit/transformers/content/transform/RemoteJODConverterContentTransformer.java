@@ -44,7 +44,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
             MIMETYPE_TEXT_RICHTEXT,
             MimetypeMap.MIMETYPE_HTML, MimetypeMap.MIMETYPE_XHTML,
             MimetypeMap.MIMETYPE_TEXT_PLAIN,
-            MimetypeMap.MIMETYPE_VISIO,
+            MimetypeMap.MIMETYPE_VISIO,MimetypeMap.MIMETYPE_VISIO_2013,
             MimetypeMap.MIMETYPE_EXCEL});
 
     private String endpoint = DEFAULT_JODCONVERTER_ENDPOINT;
