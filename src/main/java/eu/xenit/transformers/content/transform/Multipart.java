@@ -2,6 +2,7 @@ package eu.xenit.transformers.content.transform;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +14,7 @@ import java.net.URLConnection;
 import org.alfresco.service.cmr.repository.ContentWriter;
 
 public class Multipart {
+
     private final String boundary;
     private static final String LINE_FEED = "\r\n";
     private HttpURLConnection httpConn;
@@ -32,12 +34,11 @@ public class Multipart {
     private int status;
 
     /**
-     * This constructor initializes a new HTTP POST request with content type
-     * is set to multipart/form-data
+     * This constructor initializes a new HTTP POST request with content type is set to multipart/form-data
      *
-     * @param requestURL
-     * @param charset
-     * @throws IOException
+     * @param requestURL url to call
+     * @param charset charset to use
+     * @throws IOException if there is a problem opening the connection
      */
     public Multipart(String requestURL, String charset)
             throws IOException {
@@ -60,7 +61,7 @@ public class Multipart {
     /**
      * Adds a form field to the request
      *
-     * @param name  field name
+     * @param name field name
      * @param value field value
      */
     public void addFormField(String name, String value) {
@@ -74,6 +75,12 @@ public class Multipart {
         writer.flush();
     }
 
+    /**
+     * Adds a form field to the request, without the final LINE_FEED at the end
+     *
+     * @param name field name
+     * @param value field value
+     */
     public void addFormFieldWithoutEnding(String name, String value) {
         writer.append("--" + boundary).append(LINE_FEED);
         writer.append("Content-Disposition: form-data; name=\"" + name + "\"")
@@ -88,12 +95,11 @@ public class Multipart {
     /**
      * Adds a upload file section to the request
      *
-     * @param fieldName  name attribute in input type="file" name="..."
+     * @param fieldName name attribute in input type="file" name="..."
      * @param uploadFile a File to be uploaded
-     * @throws IOException
+     * @throws IOException if file does not exist or it cannot be read
      */
-    public void addFilePart(String fieldName, File uploadFile)
-            throws IOException {
+    public void addFilePart(String fieldName, File uploadFile) throws IOException {
         String fileName = uploadFile.getName();
         writer.append("--" + boundary).append(LINE_FEED);
         writer.append(
@@ -120,6 +126,15 @@ public class Multipart {
         writer.flush();
     }
 
+
+    /**
+     * Adds a upload inputStream section to the request
+     *
+     * @param fieldName name attribute in input type="file" name="..."
+     * @param inputStream the inputStream to be uploaded
+     * @param mimetype content type of the inputStream
+     * @throws IOException if file does not exist or it cannot be read
+     */
     public void addInputStreamPart(String fieldName, InputStream inputStream, String mimetype)
             throws IOException {
         String fileName = "dummy.docx";
@@ -149,7 +164,7 @@ public class Multipart {
     /**
      * Adds a header field to the request.
      *
-     * @param name  - name of the header field
+     * @param name - name of the header field
      * @param value - value of the header field
      */
     public void addHeaderField(String name, String value) {
@@ -159,6 +174,8 @@ public class Multipart {
 
     /**
      * Completes the request and receives response from the server.
+     * @param finalWriter final writer to write into
+     * @throws IOException if there was a problem with the request
      */
     public void finish(ContentWriter finalWriter) throws IOException {
         writer.append(LINE_FEED).flush();

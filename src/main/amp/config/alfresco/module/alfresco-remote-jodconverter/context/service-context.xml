@@ -3,9 +3,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-   <bean id="transformer.RemoteJODConverter" class="eu.xenit.transformers.content.transform.RemoteJODConverterContentTransformer"
-        parent="baseContentTransformer">
-        <!-- Enables timeout support -->
+   <bean id="transformer.RemoteJODConverter" class="eu.xenit.transformers.content.transform.RemoteJODConverterContentTransformer" parent="baseContentTransformer">
        <property name="useTimeoutThread" value="${content.transformer.RemoteJODConverter.useTimeoutThread}"/>
        <property name="endpoint" value="${content.transformer.RemoteJODConverter.endpoint}" />
     </bean>

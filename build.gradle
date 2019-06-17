@@ -1,0 +1,130 @@
+plugins {
+    id 'java'
+    id 'eu.xenit.amp' version '0.2.0'
+    id 'eu.xenit.alfresco' version '0.2.0'
+    id 'eu.xenit.docker-alfresco' version '4.0.2'
+    id 'io.codearte.nexus-staging' version '0.21.0' // see https://github.com/Codearte/gradle-nexus-staging-plugin
+    id 'maven-publish'
+    id 'signing'
+}
+
+description = 'Remote-jodconverter amp for Alfresco'
+
+group = 'eu.xenit.transformers'
+sourceCompatibility = '1.8'
+
+def baseVersion = '2.0.0'
+def branchName = System.env.TRAVIS_BRANCH
+def isRelease = branchName != null && branchName.startsWith("release")
+if (isRelease)
+    version = "$baseVersion"
+else
+    version = "$baseVersion-SNAPSHOT"
+
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://artifacts.alfresco.com/nexus/content/groups/public/"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+ext.alfrescoVersion = "5.1.g"
+
+dependencies {
+    alfrescoProvided "org.alfresco:alfresco-repository:${alfrescoVersion}"
+
+    /* Alfresco with remote jod converter amp docker image */
+    alfrescoAmp files(project.amp)
+    baseAlfrescoWar "org.alfresco:alfresco:${alfrescoVersion}@war"
+    baseShareWar "org.alfresco:share:${alfrescoVersion}@war"
+}
+
+
+dockerAlfresco {
+    // will need first to make these public
+    baseImage = "hub.xenit.eu/alfresco-community:${alfrescoVersion}"
+
+    // current base images have already a version of jodconverter amp, therefore delete that first (leanImage=false)
+    leanImage = false
+
+    dockerBuild {
+        repository = 'xeniteu/alfresco-remote-jodconverter-test'
+        automaticTags = true
+    }
+}
+
+dockerCompose {
+    useComposeFiles = ["${project.projectDir}/src/test/resources/docker-compose.yml"]
+}
+
+task openUrlInBrowser {
+    dependsOn 'composeUp'
+    doLast {
+        def serviceInfo = getTasks().getByName("composeUp").getServicesInfos().get("alfresco-core")
+        def host = serviceInfo.getHost()
+        def port = serviceInfo.getPort()
+        java.awt.Desktop.desktop.browse "http://$host:$port/share".toURI()
+    }
+
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+
+
+nexusStaging {
+    packageGroup = project.group
+    username = System.env.PUBLISH_USER != null ? System.env.PUBLISH_USER : ''
+    password = System.env.PUBLISH_PASSWORD != null ? System.env.PUBLISH_PASSWORD : ''
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact amp
+        }
+    }
+    repositories {
+        maven {
+            def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+            def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = System.env.PUBLISH_USER != null ? System.env.PUBLISH_USER : ''
+                password = System.env.PUBLISH_PASSWORD != null ? System.env.PUBLISH_PASSWORD : ''
+            }
+        }
+    }
+}
+signing {
+    //required { !(version.endsWith('SNAPSHOT')) && gradle.taskGraph.hasTask("publish") }
+    required { gradle.taskGraph.hasTask("publish") }
+    sign publishing.publications.mavenJava
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(publish)) {
+        if ((System.env.SIGN_KEY_ID == null) || (System.env.SIGN_SECRET_KEY_RINGFILE == null) || (System.env.SIGN_PASSWORD == null)) {
+            //throw new GradleException('You need to provide signing params in order to sign artifacts')
+        } else {
+            ext."signing.keyId" = (System.env.SIGN_KEY_ID != null ? System.env.SIGN_KEY_ID : '')
+            ext."signing.secretKeyRingFile" = (System.env.SIGN_SECRET_KEY_RINGFILE != null ? System.env.SIGN_SECRET_KEY_RINGFILE : '')
+            ext."signing.password" = (System.env.SIGN_PASSWORD != null ? System.env.SIGN_PASSWORD : '')
+        }
+    }
+}
+
