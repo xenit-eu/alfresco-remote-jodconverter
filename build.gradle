@@ -84,7 +84,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 
-
 nexusStaging {
     packageGroup = project.group
     username = System.env.PUBLISH_USER != null ? System.env.PUBLISH_USER : ''
@@ -93,6 +92,32 @@ nexusStaging {
 
 publishing {
     publications {
+        all {
+            pom {
+                url = 'https://github.com/xenit-eu/alfresco-remote-jodconverter'
+                name = 'alfresco-remote-jodconverter'
+                description = "This project aims at externalizing office documents conversions to a remote JODConverter server."
+
+                scm {
+                    connection = 'scm:git:git@github.com:xenit-eu/alfresco-remote-jodconverter.git'
+                    developerConnection = 'scm:git:git@github.com:xenit-eu/alfresco-remote-jodconverter.git'
+                    url = 'https://github.com/xenit-eu/alfresco-remote-jodconverter.git'
+                }
+                developers {
+                    developer {
+                        id = "xenit"
+                        name = "Xenit Solutions NV"
+                    }
+                }
+
+                licenses {
+                    license {
+                        name = 'GNU Lesser General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+                    }
+                }
+            }
+        }
         mavenJava(MavenPublication) {
             artifact amp
         }
