@@ -114,7 +114,7 @@ public class RemoteJODConverterContentTransformer extends AbstractContentTransfo
 
         InputStream is = reader.getContentInputStream();
 
-        Multipart part = new Multipart(DEFAULT_JODCONVERTER_ENDPOINT, "UTF-8");
+        Multipart part = new Multipart(endpoint, "UTF-8");
         part.addInputStreamPart("inputFile", is, sourceMimeType);
         part.addFormFieldWithoutEnding("outputFormat", "pdf");
 
