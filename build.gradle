@@ -36,7 +36,9 @@ tasks.withType(JavaCompile) {
 ext.alfrescoVersion = "5.1.g"
 
 dependencies {
-    alfrescoProvided "org.alfresco:alfresco-repository:${alfrescoVersion}"
+    alfrescoProvided ("org.alfresco:alfresco-repository:${alfrescoVersion}") {
+        exclude group: "org.springframework.social"
+    }
 
     /* Alfresco with remote jod converter amp docker image */
     alfrescoAmp files(project.amp)
