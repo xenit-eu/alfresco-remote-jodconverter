@@ -13,14 +13,13 @@ services:
 #      - CATALINA_OPTS=-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
 
   postgresql:
-    image: xeniteu/postgres
+    image: xenit/postgres
     environment:
       - POSTGRES_USER=alfresco
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=alfresco
 
   jodconverter:
-  # TO DO: replace with public image once available
-    image: xeniteu/jodconverter:4.2.3-SNAPSHOT
+    image: xenit/jodconverter:4.2.3-SNAPSHOT
     ports:
       - 8080
