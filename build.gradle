@@ -2,7 +2,8 @@ plugins {
     id 'java'
     id 'eu.xenit.amp' version '0.2.0'
     id 'eu.xenit.alfresco' version '0.2.0'
-    id 'eu.xenit.docker-alfresco' version '4.0.2'
+    id 'eu.xenit.docker-alfresco' version '5.0.4'
+    id 'eu.xenit.docker-compose' version '5.0.4'
     id 'io.codearte.nexus-staging' version '0.21.0' // see https://github.com/Codearte/gradle-nexus-staging-plugin
     id 'maven-publish'
     id 'signing'
@@ -33,7 +34,7 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-ext.alfrescoVersion = "5.1.g"
+ext.alfrescoVersion = "5.1.e"
 
 dependencies {
     alfrescoProvided ("org.alfresco:alfresco-repository:${alfrescoVersion}") {
@@ -43,36 +44,25 @@ dependencies {
     /* Alfresco with remote jod converter amp docker image */
     alfrescoAmp files(project.amp)
     baseAlfrescoWar "org.alfresco:alfresco:${alfrescoVersion}@war"
-    baseShareWar "org.alfresco:share:${alfrescoVersion}@war"
 }
 
 
 dockerAlfresco {
     // will need first to make these public
-    baseImage = "hub.xenit.eu/alfresco-community:${alfrescoVersion}"
+    baseImage = "xenit/alfresco-repository-community:${alfrescoVersion}"
 
     // current base images have already a version of jodconverter amp, therefore delete that first (leanImage=false)
     leanImage = false
 
     dockerBuild {
-        repository = 'xeniteu/alfresco-remote-jodconverter-test'
+        repository = 'alfresco-remote-jodconverter-test'
         automaticTags = true
     }
 }
 
 dockerCompose {
     useComposeFiles = ["${project.projectDir}/src/test/resources/docker-compose.yml"]
-}
-
-task openUrlInBrowser {
-    dependsOn 'composeUp'
-    doLast {
-        def serviceInfo = getTasks().getByName("composeUp").getServicesInfos().get("alfresco-core")
-        def host = serviceInfo.getHost()
-        def port = serviceInfo.getPort()
-        java.awt.Desktop.desktop.browse "http://$host:$port/share".toURI()
-    }
-
+    isRequiredBy(check)
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
