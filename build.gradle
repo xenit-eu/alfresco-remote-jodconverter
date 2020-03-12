@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'eu.xenit.amp' version '0.2.0'
-    id 'eu.xenit.alfresco' version '0.2.0'
+    id 'eu.xenit.amp' version '1.0.1'
+    id 'eu.xenit.alfresco' version '1.0.1'
     id 'eu.xenit.docker-alfresco' version '5.0.4'
     id 'eu.xenit.docker-compose' version '5.0.4'
     id 'io.codearte.nexus-staging' version '0.21.0' // see https://github.com/Codearte/gradle-nexus-staging-plugin
@@ -25,9 +25,7 @@ else
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://artifacts.alfresco.com/nexus/content/groups/public/"
-    }
+    alfrescoPublic()
 }
 
 tasks.withType(JavaCompile) {
