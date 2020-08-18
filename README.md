@@ -20,7 +20,7 @@ This is the default global config for the addon :
 # Set the prority of the transformer, lower number means higher priority
 content.transformer.RemoteJODConverter.priority=30
 # Endpoint for the jod converter, should either point to one server or to the load balancer
-content.transformer.RemoteJODConverter.endpoint=https://jodconverter/converter
+content.transformer.RemoteJODConverter.endpoint=http://jodconverter:8080/converter
 # Timeout setting for the transformation 
 content.transformer.RemoteJODConverter.timeoutMs=60000
 # Timeout setting for reading the file
