@@ -6,6 +6,9 @@ This project aims at externalizing office documents conversions to a remote JODC
 
 These are the prerequisites for this addon : You have a remote host with a JODConverter server on board. Or even better have a JODConverter farm behind a load balancer.
 
+Compatible with our Docker Image `xenit/jodconverter` as of v4.2.3.
+For the latest release, please visit https://github.com/xenit-eu/jodconverter or https://hub.docker.com/r/xenit/jodconverter/.
+
 ## Addon installation
 
 This is how you should be installing this addon in production : Just use alfresco mmt for applying the amp to the alfresco war
@@ -17,7 +20,7 @@ This is the default global config for the addon :
 # Set the prority of the transformer, lower number means higher priority
 content.transformer.RemoteJODConverter.priority=30
 # Endpoint for the jod converter, should either point to one server or to the load balancer
-content.transformer.RemoteJODConverter.endpoint=https://jodconverter/converter/service
+content.transformer.RemoteJODConverter.endpoint=http://jodconverter:8080/converter
 # Timeout setting for the transformation 
 content.transformer.RemoteJODConverter.timeoutMs=60000
 # Timeout setting for reading the file
